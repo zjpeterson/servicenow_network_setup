@@ -83,3 +83,6 @@
           model_id: Juniper Generic
       loop: "{{ hosts }}"
       when: "'juniper' in item.summary_fields.groups.results | string"
+
+- name: Resync inventory
+  ansible.builtin.import_playbook: zjpeterson.servicenow_network.inventory_update

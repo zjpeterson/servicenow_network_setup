@@ -1,0 +1,15 @@
+---
+- name: Apply Controller configuration
+  hosts: controller
+  connection: local
+  gather_facts: false
+
+  collections:
+    - ansible.controller
+    - awx.awx
+
+  vars_files:
+    - config_aap.yml
+
+  roles:
+    - infra.controller_configuration.inventory_source_update
