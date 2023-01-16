@@ -23,12 +23,36 @@ snow_attributes:
     function_definition: glidefunction:datediff(u_current_time,u_last_backup)
 
 snow_reports:
-  - title: Network software versions
+  - title: Cisco IOS software versions
     type: pie
     source_type: table
     table: cmdb_ci_netgear
     field: firmware_version
-    filter: firmware_versionISNOTEMPTY
+    filter: firmware_versionISNOTEMPTY^model_id.display_nameSTARTSWITHCisco CSR^ORmodel_id.display_nameSTARTSWITHCisco Catalyst
+    aggregate: COUNT
+    chart_size: large
+  - title: Cisco NX-OS software versions
+    type: pie
+    source_type: table
+    table: cmdb_ci_netgear
+    field: firmware_version
+    filter: firmware_versionISNOTEMPTY^model_id.display_nameSTARTSWITHCisco Nexus
+    aggregate: COUNT
+    chart_size: large
+  - title: Arista EOS software versions
+    type: pie
+    source_type: table
+    table: cmdb_ci_netgear
+    field: firmware_version
+    filter: firmware_versionISNOTEMPTY^model_id.display_nameSTARTSWITHArista
+    aggregate: COUNT
+    chart_size: large
+  - title: Juniper JunOS software versions
+    type: pie
+    source_type: table
+    table: cmdb_ci_netgear
+    field: firmware_version
+    filter: firmware_versionISNOTEMPTY^model_id.display_nameSTARTSWITHJuniper
     aggregate: COUNT
     chart_size: large
   - title: Time since last backup
