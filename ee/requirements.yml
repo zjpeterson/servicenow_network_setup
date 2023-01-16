@@ -1,6 +1,6 @@
 ---
 collections:
   - name: zjpeterson.servicenow_network
-    version: 0.2.0
+    version: 0.3.0
   - name: ansible.controller
     version: 4.2.0
