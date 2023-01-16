@@ -9,12 +9,13 @@
     ansible_password: "{{ controller_ssh_password | default(controller_password) }}"
 
   tasks:
-    - name: Create backups directory
+    - name: Create directories
       ansible.builtin.file:
         state: directory
-        path: /var/lib/awx/netbackup
+        path: "{{ item }}"
         owner: awx
         group: awx
         mode: '700'
       become: true
       become_user: awx
+      loop: "{{ linux_directories }}"

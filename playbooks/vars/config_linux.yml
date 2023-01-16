@@ -1,0 +1,7 @@
+---
+linux_directories:
+  - /var/lib/awx/net_backup
+  - /var/lib/awx/net_image/ios
+  - /var/lib/awx/net_image/eos
+  - /var/lib/awx/net_image/nxos
+  - /var/lib/awx/net_image/junos
