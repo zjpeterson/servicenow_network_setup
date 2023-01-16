@@ -1,0 +1,13 @@
+---
+ansible-navigator:
+  logging:
+    level: critical
+  execution-environment:
+    container-engine: podman
+    enabled: True
+    image: quay.io/zachp/servicenow_network:latest
+    pull:
+      policy: always
+  playbook-artifact:
+    enable: false
+  mode: stdout
