@@ -22,3 +22,4 @@
     - infra.controller_configuration.inventory_sources
     - infra.controller_configuration.inventory_source_update
     - infra.controller_configuration.job_templates
+    - infra.controller_configuration.workflow_job_templates

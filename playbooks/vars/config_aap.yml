@@ -4,7 +4,8 @@ controller_settings:
     value:
       - /etc/pki/ca-trust:/etc/pki/ca-trust:O
       - /usr/share/pki:/usr/share/pki:O
-      - /var/lib/awx/netbackup:/tmp/netbackup
+      - /var/lib/awx/net_backup:/tmp/net_backup
+      - /var/lib/awx/net_image:/tmp/net_image
 
 controller_organizations:
   - name: Network Management
@@ -78,6 +79,7 @@ controller_templates:
     project: Network Toolkit
     playbook: playbook_cmdb_facts.yml
     execution_environment: Default execution environment
+    ask_limit_on_launch: true
   - name: Network Toolkit | Configuration Backup
     organization: Network Management
     inventory: Network Devices
@@ -87,6 +89,7 @@ controller_templates:
     project: Network Toolkit
     playbook: playbook_config_backup.yml
     execution_environment: Default execution environment
+    ask_limit_on_launch: true
   - name: Network Toolkit | Configuration Restore
     organization: Network Management
     inventory: Network Devices
@@ -107,3 +110,42 @@ controller_templates:
           type: text
           variable: backup_date_time
           default: 2023-01-01@00:00:00
+  - name: Component | Software upgrade only
+    organization: Network Management
+    inventory: Network Devices
+    credentials:
+      - Network Devices
+    project: Network Toolkit
+    playbook: playbook_upgrade.yml
+    execution_environment: Default execution environment
+    ask_limit_on_launch: true
+    ask_variables_on_launch: true
+    extra_vars:
+      image_name: exmaple.bin
+
+controller_workflows:
+  - name: Network Toolkit | Software upgrade
+    organization: Network Management
+    state: present
+    ask_limit_on_launch: true
+    survey_enabled: true
+    survey_spec:
+      name: ""
+      description: ""
+      spec:
+        - question_name: Name of the image file to use
+          required: true
+          type: text
+          variable: image_name
+          default: example.bin
+    simplified_workflow_nodes:
+      - identifier: Config Backup
+        unified_job_template: Network Toolkit | Configuration Backup
+        success_nodes:
+          - Image Upgrade
+      - identifier: Image Upgrade
+        unified_job_template: Component | Software upgrade only
+        success_nodes:
+          - CMDB Update
+      - identifier: CMDB Update
+        unified_job_template: Network Toolkit | CMDB Fact Discovery
