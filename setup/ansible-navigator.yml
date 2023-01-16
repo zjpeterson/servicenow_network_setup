@@ -1,5 +1,9 @@
 ---
 ansible-navigator:
+  ansible:
+    inventory:
+      entries:
+        - inventory_setup.yml
   logging:
     level: critical
   execution-environment:
