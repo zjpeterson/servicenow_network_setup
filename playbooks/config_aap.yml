@@ -1,0 +1,24 @@
+---
+- name: Apply Controller configuration
+  hosts: controller
+  connection: local
+  gather_facts: false
+
+  collections:
+    - ansible.controller
+    - awx.awx
+
+  vars_files:
+    - config_aap.yml
+
+  roles:
+    - infra.controller_configuration.settings
+    - infra.controller_configuration.organizations
+    - infra.controller_configuration.credential_types
+    - infra.controller_configuration.credentials
+    - role: infra.controller_configuration.projects
+      controller_configuration_async_delay: 30
+    - infra.controller_configuration.inventories
+    - infra.controller_configuration.inventory_sources
+    - infra.controller_configuration.inventory_source_update
+    - infra.controller_configuration.job_templates

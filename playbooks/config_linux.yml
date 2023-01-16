@@ -1,0 +1,20 @@
+---
+- name: Linux setup
+  hosts: controller
+  gather_facts: false
+
+  vars:
+    ansible_host: "{{ controller_hostname }}"
+    ansible_user: "{{ controller_ssh_user | default('student') }}"
+    ansible_password: "{{ controller_ssh_password | default(controller_password) }}"
+
+  tasks:
+    - name: Create backups directory
+      ansible.builtin.file:
+        state: directory
+        path: /var/lib/awx/netbackup
+        owner: awx
+        group: awx
+        mode: '700'
+      become: true
+      become_user: awx

@@ -1,0 +1,85 @@
+---
+- name: Populate SNOW with workshop devices
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  module_defaults:
+    servicenow.itsm.configuration_item:
+      state: present
+      sys_class_name: cmdb_ci_netgear
+      instance:
+        host: "{{ hostvars.snow.snow_host }}"
+        username: "{{ hostvars.snow.snow_username }}"
+        password: "{{ hostvars.snow.snow_password }}"
+    servicenow.itsm.api:
+      instance:
+        host: "{{ hostvars.snow.snow_host }}"
+        username: "{{ hostvars.snow.snow_username }}"
+        password: "{{ hostvars.snow.snow_password }}"
+    servicenow.itsm.api_info:
+      instance:
+        host: "{{ hostvars.snow.snow_host }}"
+        username: "{{ hostvars.snow.snow_username }}"
+        password: "{{ hostvars.snow.snow_password }}"
+
+  tasks:
+    - name: Get inventory ID for Workshop Inventory
+      ansible.builtin.set_fact:
+        inventory_id: "{{ lookup('ansible.controller.controller_api', 'inventories',
+          host=hostvars.controller.controller_hostname, username=hostvars.controller.controller_username, password=hostvars.controller.controller_password,
+          query_params={'name': 'Workshop Inventory'} ).id }}"
+
+    - name: Get hosts in inventory
+      ansible.builtin.set_fact:
+        hosts: "{{ lookup('ansible.controller.controller_api', 'hosts',
+          host=hostvars.controller.controller_hostname, username=hostvars.controller.controller_username, password=hostvars.controller.controller_password,
+          query_params={'inventory': inventory_id, 'name__icontains': 'rtr'} ) }}"
+
+    - name: Get all netgear records
+      servicenow.itsm.api_info:
+        resource: cmdb_ci_netgear
+        columns: sys_id
+      register: netgear
+
+    - name: Purge netgear records
+      servicenow.itsm.configuration_item:
+        state: absent
+        sys_id: "{{ item.sys_id }}"
+      loop: "{{ netgear.record }}"
+
+    - name: Register arista
+      vars:
+        host_vars: "{{ item.variables | from_yaml }}"
+      servicenow.itsm.configuration_item:
+        name: "{{ item.name }}"
+        ip_address: "{{ host_vars.ansible_host }}"
+        other:
+          manufacturer: Arista
+          model_id: Arista Generic
+      loop: "{{ hosts }}"
+      when: "'arista' in item.summary_fields.groups.results | string"
+
+    - name: Register cisco
+      vars:
+        host_vars: "{{ item.variables | from_yaml }}"
+      servicenow.itsm.configuration_item:
+        name: "{{ item.name }}"
+        ip_address: "{{ host_vars.ansible_host }}"
+        other:
+          manufacturer: Cisco
+          model_id: Cisco Catalyst Generic
+      loop: "{{ hosts }}"
+      when: "'cisco' in item.summary_fields.groups.results | string"
+
+    - name: Register juniper
+      vars:
+        host_vars: "{{ item.variables | from_yaml }}"
+      servicenow.itsm.configuration_item:
+        name: "{{ item.name }}"
+        ip_address: "{{ host_vars.ansible_host }}"
+        other:
+          manufacturer: Juniper
+          model_id: Juniper Generic
+      loop: "{{ hosts }}"
+      when: "'juniper' in item.summary_fields.groups.results | string"

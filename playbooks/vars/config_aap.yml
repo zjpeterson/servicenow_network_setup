@@ -1,0 +1,109 @@
+---
+controller_settings:
+  - name: AWX_ISOLATION_SHOW_PATHS
+    value:
+      - /etc/pki/ca-trust:/etc/pki/ca-trust:O
+      - /usr/share/pki:/usr/share/pki:O
+      - /var/lib/awx/netbackup:/tmp/netbackup
+
+controller_organizations:
+  - name: Network Management
+    galaxy_credentials:
+      - Ansible Galaxy
+
+controller_credential_types:
+  - name: ServiceNow
+    kind: cloud
+    inputs:
+      fields:
+        - id: host
+          type: string
+          label: Host
+        - id: username
+          type: string
+          label: Username
+        - id: password
+          type: string
+          label: Password
+          secret: true
+      required:
+        - host
+        - username
+        - password
+    injectors:
+      env:
+        SN_HOST: "{% raw %}{  { host }}{% endraw %}"
+        SN_USERNAME: "{% raw %}{  { username }}{% endraw %}"
+        SN_PASSWORD: "{% raw %}{  { password }}{% endraw %}"
+
+controller_credentials:
+  - name: ServiceNow
+    organization: Network Management
+    credential_type: ServiceNow
+    inputs:
+      host: "{{ hostvars.snow.snow_host }}"
+      username: "{{ hostvars.snow.snow_username }}"
+      password: "{{ hostvars.snow.snow_password }}"
+  - name: Network Devices
+    organization: Network Management
+    credential_type: Machine
+
+controller_projects:
+  - name: Network Toolkit
+    organization: Network Management
+    scm_type: git
+    scm_url: https://github.com/zjpeterson/servicenow_network_content.git
+
+controller_inventories:
+  - name: Network Devices
+    organization: Network Management
+
+controller_inventory_sources:
+  - name: ServiceNow cmdb_ci_netgear
+    inventory: Network Devices
+    organization: Network Management
+    credential: ServiceNow
+    overwrite: true
+    source: scm
+    source_project: Network Toolkit
+    source_path: inventory_now.yml
+
+controller_templates:
+  - name: Network Toolkit | CMDB Fact Discovery
+    organization: Network Management
+    inventory: Network Devices
+    credentials:
+      - Network Devices
+      - ServiceNow
+    project: Network Toolkit
+    playbook: playbook_cmdb_facts.yml
+    execution_environment: Default execution environment
+  - name: Network Toolkit | Configuration Backup
+    organization: Network Management
+    inventory: Network Devices
+    credentials:
+      - Network Devices
+      - ServiceNow
+    project: Network Toolkit
+    playbook: playbook_config_backup.yml
+    execution_environment: Default execution environment
+  - name: Network Toolkit | Configuration Restore
+    organization: Network Management
+    inventory: Network Devices
+    credentials:
+      - Network Devices
+      - ServiceNow
+    project: Network Toolkit
+    playbook: playbook_config_restore.yml
+    execution_environment: Default execution environment
+    ask_limit_on_launch: true
+    survey_enabled: true
+    survey_spec:
+      name: ""
+      description: ""
+      spec:
+        - question_name: Backup date and time
+          required: true
+          type: text
+          variable: backup_date_time
+          default: 2023-01-01@00:00:00

@@ -1,0 +1,40 @@
+---
+namespace: zjpeterson
+
+name: servicenow_network
+
+version: 0.1.0
+
+readme: README.md
+
+authors:
+- Zach Peterson <zachp@redhat.com>
+
+description: Turn-key network management using Ansible Automation Controller + ServiceNow
+
+license:
+- GPL-2.0-or-later
+
+license_file: ''
+
+tags:
+  - servicenow
+  - network
+
+dependencies:
+  awx.awx: ">=19.0.0"
+  infra.controller_configuration: ">=2.2.4"
+  servicenow.itsm: ">=2.0.0"
+  community.general: ">=1.0.0"
+
+repository: https://github.com/zjpeterson/servicenow_network_setup
+
+documentation: https://github.com/zjpeterson/servicenow_network_setup
+
+homepage: https://github.com/zjpeterson/servicenow_network_setup
+
+issues: https://github.com/zjpeterson/servicenow_network_setup/issues
+
+build_ignore:
+  - ee
+  - setup

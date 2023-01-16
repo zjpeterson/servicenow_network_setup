@@ -1,0 +1,4 @@
+---
+collections:
+  - zjpeterson.servicenow_network
+  - ansible.controller

@@ -1,0 +1,9 @@
+---
+- name: AAP application config
+  ansible.builtin.import_playbook: config_aap.yml
+
+- name: AAP Linux config
+  ansible.builtin.import_playbook: config_linux.yml
+
+- name: ServiceNow config
+  ansible.builtin.import_playbook: config_snow.yml

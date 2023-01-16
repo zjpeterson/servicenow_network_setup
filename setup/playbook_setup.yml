@@ -1,0 +1,3 @@
+---
+- name: Configure all components
+  ansible.builtin.import_playbook: zjpeterson.servicenow_network.config_all

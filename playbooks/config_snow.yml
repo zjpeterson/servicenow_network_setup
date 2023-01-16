@@ -1,0 +1,100 @@
+---
+- name: Apply ServiceNow configuration
+  hosts: snow
+  connection: local
+  gather_facts: false
+
+  vars_files:
+    - config_snow.yml
+
+  module_defaults:
+    servicenow.itsm.api:
+      instance:
+        host: "{{ snow_host }}"
+        username: "{{ snow_username }}"
+        password: "{{ snow_password }}"
+    servicenow.itsm.api_info:
+      instance:
+        host: "{{ snow_host }}"
+        username: "{{ snow_username }}"
+        password: "{{ snow_password }}"
+
+  tasks:
+    - name: Get vendors
+      servicenow.itsm.api_info:
+        resource: core_company
+        columns: name
+      register: companies
+
+    - name: Create vendors
+      vars:
+        tmp_dict:
+          name: "{{ item }}"
+      servicenow.itsm.api:
+        action: post
+        resource: core_company
+        data:
+          name: "{{ item }}"
+      loop: "{{ snow_vendors }}"
+      when: tmp_dict not in companies.record
+
+    - name: Get hardware models
+      servicenow.itsm.api_info:
+        resource: cmdb_model
+        columns:
+          - display_name
+          - sys_class_name
+      register: models
+
+    - name: Create models
+      vars:
+        tmp_dict:
+          display_name: "{{ item.manufacturer }} {{ item.name }}"
+          sys_class_name: "{{ item.sys_class_name }}"
+      servicenow.itsm.api:
+        action: post
+        resource: cmdb_model
+        data: "{{ item }}"
+      loop: "{{ snow_models }}"
+      when: tmp_dict not in models.record
+
+    - name: Get dictionary
+      servicenow.itsm.api_info:
+        resource: sys_dictionary
+        columns:
+          - name
+          - element
+        sysparm_query: name={{ snow_attributes | community.general.json_query('[].name') | unique | join('^ORname=') }}
+      register: dictionary
+
+    - name: Create table attributes
+      vars:
+        tmp_dict:
+          name: "{{ item.name }}"
+          element: "{{ item.element }}"
+      servicenow.itsm.api:
+        action: post
+        resource: sys_dictionary
+        data: "{{ item }}"
+      loop: "{{ snow_attributes }}"
+      when: tmp_dict not in dictionary.record
+
+    - name: Get reports
+      servicenow.itsm.api_info:
+        resource: sys_report
+        columns:
+          - title
+          - table
+      register: reports
+
+    - name: Create reports
+      vars:
+        tmp_dict:
+          title: "{{ item.title }}"
+          table: "{{ item.table }}"
+      servicenow.itsm.api:
+        action: post
+        resource: sys_report
+        data: "{{ item }}"
+      loop: "{{ snow_reports }}"
+      when: tmp_dict not in reports.record

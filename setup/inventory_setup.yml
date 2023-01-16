@@ -1,0 +1,16 @@
+---
+all:
+  hosts:
+    controller:
+      # For Controller application, not SSH
+      controller_hostname: student1.guid.example.opentlc.com
+      controller_username: admin
+      controller_password: password
+      # For SSH with the Linux host
+      # Only required if different from student/{{controller_password}}
+      # controller_ssh_user:
+      # controller_ssh_password:
+    snow:
+      snow_host: https://devXXXXXX.service-now.com
+      snow_username: admin
+      snow_password: password

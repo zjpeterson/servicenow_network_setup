@@ -1,0 +1,68 @@
+---
+snow_attributes:
+  - name: cmdb_ci_netgear
+    column_label: Last backup
+    element: u_last_backup
+    internal_type: glide_date_time
+  - name: cmdb_ci_netgear
+    column_label: Current time
+    element: u_current_time
+    internal_type: glide_date_time
+    calculation: |-
+      (function calculatedFieldValue(current) {
+        var gr=new GlideDateTime();
+        return gr.getDisplayValue();
+      })(current);
+    virtual: true
+    virtual_type: script
+  - name: cmdb_ci_netgear
+    column_label: Since last backup
+    element: u_time_since_backup
+    internal_type: glide_duration
+    function_field: true
+    function_definition: glidefunction:datediff(u_current_time,u_last_backup)
+
+snow_reports:
+  - title: Network software versions
+    type: pie
+    source_type: table
+    table: cmdb_ci_netgear
+    field: firmware_version
+    filter: firmware_versionISNOTEMPTY
+    aggregate: COUNT
+    chart_size: large
+  - title: Time since last backup
+    type: pie
+    source_type: table
+    table: cmdb_ci_netgear
+    field: u_time_since_backup
+    aggregate: COUNT
+    chart_size: large
+
+snow_vendors:
+  - Arista
+  - Juniper
+  - Cisco
+
+snow_models:
+  - manufacturer: Arista
+    name: Generic
+    sys_class_name: cmdb_hardware_product_model
+  - manufacturer: Juniper
+    name: Generic
+    sys_class_name: cmdb_hardware_product_model
+  - manufacturer: Cisco
+    name: Catalyst Generic
+    sys_class_name: cmdb_hardware_product_model
+  - manufacturer: Cisco
+    name: Nexus Generic
+    sys_class_name: cmdb_hardware_product_model
+  - manufacturer: Arista
+    name: vEOS
+    sys_class_name: cmdb_hardware_product_model
+  - manufacturer: Juniper
+    name: vSRX
+    sys_class_name: cmdb_hardware_product_model
+  - manufacturer: Cisco
+    name: CSR1000V
+    sys_class_name: cmdb_hardware_product_model
