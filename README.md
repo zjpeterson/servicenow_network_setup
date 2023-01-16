@@ -37,6 +37,13 @@ This is desgned to be tested (and demoed) against an [Ansible Network Automation
 
 The playbook `playbook_workshop.yml` can be used to set these environments up prior to running `playbook_setup.yml`.
 
+## Assumptions
+
+Use of this setup makes a number of assumptions about the environment it will be managing, including but not limited to:
+
+- Network devices are populated in the ServiceNow Network Gear table (cmdb_ci_netgear) or one of its child tables
+- The Ansible Automation Controller machine is an acceptable place to store backups and software images
+
 ## Problems
 
 - Controller has no built-in way to sync inventory from ServiceNow, so it needs to be done with an inventory source file. Controller also does not support using such a file from a local/manual type project (and discussion of this was [closed upstream](https://github.com/ansible/awx/issues/1288)). This means that we can't avoid getting the dynamic inventory definition via Git, unless you were to do some kind of CLI-based workaround, which is unintuitive and would be practically invisible from the Controller UI. For that reason, the actual Ansible content (inventory and playbooks) are in [another repository](https://github.com/zjpeterson/servicenow_network_content).
@@ -46,3 +53,5 @@ The playbook `playbook_workshop.yml` can be used to set these environments up pr
 - Can't get a table built to track all available backup date/times as the REST API rejects a table creation with no columns - no docs available on how to provide columns at create time
 - Currently have to the use bootstrap `playbook_setup.yml` to consume this; the idea was originally to run playbooks [directly from the collection](https://docs.ansible.com/ansible/latest/collections_guide/collections_using_playbooks.html#using-a-playbook-from-a-collection), but `ansible-navigator` currently can't do it. Issue filed upstream https://github.com/ansible/ansible-navigator/issues/1385
 - Currently assuming connected environment, several changes needed to make this work without an internet connection
+- Image upgrade currently a placeholder that only uploads an image file to the target, need to work on this with upgradeable hardware
+- Software reports are not interesting to look at due to the low amount and diversity of equipment in a workshop
