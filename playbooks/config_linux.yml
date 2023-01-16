@@ -3,6 +3,9 @@
   hosts: controller
   gather_facts: false
 
+  vars_files:
+    - config_linux.yml
+
   vars:
     ansible_host: "{{ controller_hostname }}"
     ansible_user: "{{ controller_ssh_user | default('student') }}"
