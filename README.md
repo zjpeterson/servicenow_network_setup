@@ -41,6 +41,7 @@ The playbook `playbook_workshop.yml` can be used to set these environments up pr
 
 Use of this setup makes a number of assumptions about the environment it will be managing, including but not limited to:
 
+- An Ansible Automation Controller and a ServiceNow instance are created and available via users with Admin rights
 - Network devices are populated in the ServiceNow Network Gear table (cmdb_ci_netgear) or one of its child tables
 - The Ansible Automation Controller machine is an acceptable place to store backups and software images
 
