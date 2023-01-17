@@ -30,11 +30,32 @@
           host=hostvars.controller.controller_hostname, username=hostvars.controller.controller_username, password=hostvars.controller.controller_password,
           query_params={'name': 'Workshop Inventory'} ).id }}"
 
+    - name: Get project ID for Workshop Project
+      ansible.builtin.set_fact:
+        project_id: "{{ lookup('ansible.controller.controller_api', 'projects',
+          host=hostvars.controller.controller_hostname, username=hostvars.controller.controller_username, password=hostvars.controller.controller_password,
+          query_params={'name': 'Workshop Project'} ).id }}"
+
     - name: Get hosts in inventory
       ansible.builtin.set_fact:
         hosts: "{{ lookup('ansible.controller.controller_api', 'hosts',
           host=hostvars.controller.controller_hostname, username=hostvars.controller.controller_username, password=hostvars.controller.controller_password,
           query_params={'inventory': inventory_id, 'name__icontains': 'rtr'} ) }}"
+
+    - name: Get job templates
+      ansible.builtin.set_fact:
+        job_templates: "{{ lookup('ansible.controller.controller_api', 'job_templates',
+          host=hostvars.controller.controller_hostname, username=hostvars.controller.controller_username, password=hostvars.controller.controller_password,
+          query_params={'project': project_id} ) }}"
+
+    - name: Purge workshop JTs
+      ansible.controller.job_template:
+        name: "{{ item.name }}"
+        state: absent
+        controller_host: "{{ hostvars.controller.controller_hostname }}"
+        controller_username: "{{ hostvars.controller.controller_username }}"
+        controller_password: "{{ hostvars.controller.controller_password }}"
+      loop: "{{ job_templates }}"
 
     - name: Get all netgear records
       servicenow.itsm.api_info:
